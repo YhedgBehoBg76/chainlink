@@ -1,26 +1,22 @@
-cmake_minimum_required(VERSION 3.20)
-project(ChainLinkHPC VERSION 1.0 LANGUAGES CXX)
+cmake_minimum_required(VERSION 3.15)
+project(chainlink-hpc CXX)
 
 set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set(CMAKE_CXX_EXTENSIONS OFF)
+set(CMAKE_CXX_STANDARD_REQUIRED True)
 
-# Optimization flags for Release build
-set(CMAKE_CXX_FLAGS_RELEASE "-O3 -march=native -ffast-math -funroll-loops -fopenmp -flto")
-# For GCC/Clang specific flags if needed
-if(CMAKE_CXX_COMPILER_ID MATCHES "GNU|Clang")
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -Wpedantic")
+find_package(OpenMP)
+if(OpenMP_CXX_FOUND)
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${OpenMP_C_FLAGS}")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${OpenMP_CXX_FLAGS}")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} ${OpenMP_EXE_LINKER_FLAGS}")
 endif()
-
-find_package(OpenMP REQUIRED)
 
 include_directories(include)
 
-file(GLOB SOURCES "src/*.cpp")
+file(GLOB SOURCES src/*.cpp)
 
-add_executable(chainlink_sim ${SOURCES})
+add_executable(chainlink ${SOURCES})
 
-target_link_libraries(chainlink_sim PUBLIC OpenMP::OpenMP_CXX)
-
-# Ensure executable outputs to the build directory
-set_target_properties(chainlink_sim PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}")
+if(OpenMP_CXX_FOUND)
+    target_link_libraries(chainlink OpenMP::OpenMP_CXX)
+endif()

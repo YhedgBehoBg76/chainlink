@@ -8,7 +8,7 @@ def main():
     # Attempt to start xvfb if pyvista provides it, else proceed off screen
     try:
         pv.start_xvfb()
-    except AttributeError:
+    except (AttributeError, OSError):
         pass
         
     plotter = pv.Plotter(off_screen=True)
@@ -23,7 +23,7 @@ def main():
     
     plotter.screenshot('visualization/plots/02_3d_impact_pyvista.png')
     
-    plotter.export_html('visualization/plots/03_interactive_3d_impact.html')
+    # plotter.export_html('visualization/plots/03_interactive_3d_impact.html') # Disabled due to Python 3.8 incompatibility with trame
     
 if __name__ == '__main__':
     main()
